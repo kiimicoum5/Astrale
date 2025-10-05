@@ -508,7 +508,6 @@ const Planet = ({ definition, isSelected, onSelect, onPositionChange, activePara
     const speedMultiplier = isSelected && activeParams ? clamp(1 + activeParams.velocity * 0.03, 0.25, 4.5) : 1;
     const rotationMultiplier = isSelected && activeParams ? clamp(1 + activeParams.mass * 0.005, 0.5, 4.2) : 1;
     const tiltOffset = isSelected && activeParams ? degToRad(activeParams.angle) * 0.02 : 0;
-    const emissiveIntensity = isSelected && activeParams ? clamp(0.2 + activeParams.mass * 0.01, 0.05, 0.9) : 0;
     const orbitSpeed = definition.orbit.speed * speedMultiplier;
     const orbitInclination = definition.orbit.inclination + tiltOffset;
     const appliedScale = definition.scale * radiusMultiplier;
@@ -591,7 +590,7 @@ const Planet = ({ definition, isSelected, onSelect, onPositionChange, activePara
                         roughness={0.6}
                         metalness={0.1}
                         emissive={definition.color}
-                        emissiveIntensity={isSelected ? emissiveIntensity : 0}
+                        emissiveIntensity={isSelected ? 0.2 : 0.1}
                     />
                     {isSelected ? <Edges scale={1.08} color="#c026d3" /> : null}
                 </mesh>
@@ -913,14 +912,11 @@ const SimulationViewport = ({ params, controlPanelOpen: externalControlPanelOpen
     // Add API state management
     const [astronomyData, setAstronomyData] = useState<PositionsResponse | null>(null);
     const [apiLoading, setApiLoading] = useState(true);
-    const [apiError, setApiError] = useState<string | null>(null);
 
-    // Fetch real astronomical data
     useEffect(() => {
         const fetchAstronomyData = async () => {
             try {
                 setApiLoading(true);
-                setApiError(null);
                 // Fetch positions for current date/time
                 const data = await fetchCelestialPositions(
                     48.8566, // Paris latitude (default)
@@ -931,7 +927,6 @@ const SimulationViewport = ({ params, controlPanelOpen: externalControlPanelOpen
                 setAstronomyData(data);
             } catch (error) {
                 console.error('Failed to fetch astronomy data:', error);
-                setApiError(error instanceof Error ? error.message : 'Failed to fetch astronomical data');
             } finally {
                 setApiLoading(false);
             }
@@ -1115,11 +1110,6 @@ const SimulationViewport = ({ params, controlPanelOpen: externalControlPanelOpen
             {apiLoading && (
                 <div className="absolute top-6 left-1/2 z-40 -translate-x-1/2 rounded-lg border border-[#2E96F5]/40 bg-[#041032]/90 px-4 py-2 text-sm text-white backdrop-blur-xl">
                     Chargement des positions astronomiques...
-                </div>
-            )}
-            {apiError && (
-                <div className="absolute top-6 left-1/2 z-40 -translate-x-1/2 rounded-lg border border-red-500/40 bg-red-950/90 px-4 py-2 text-sm text-red-200 backdrop-blur-xl">
-                    Erreur API: {apiError} - Utilisation des positions simulées
                 </div>
             )}
 
