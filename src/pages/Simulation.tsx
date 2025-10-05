@@ -10,6 +10,7 @@ import type { PresetKey, SimulationParams } from '@/features/simulation';
 const Simulation = () => {
     const [selectedPreset, setSelectedPreset] = useState<ControlPanelPresetKey>('impactor');
     const [params, setParams] = useState<SimulationParams>({ ...scenarioPresets.impactor.params });
+    const [open, setOpen] = useState(false);
 
     useEffect(() => {
         if (selectedPreset === 'personnalise') return;
@@ -36,18 +37,22 @@ const Simulation = () => {
     }, []);
 
     return (
-        <main className="min-h-screen bg-slate-950 text-slate-100">
-            <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-8 px-6 py-10 lg:flex-row">
-                <SimulationControlPanel
-                    selectedPreset={selectedPreset}
-                    scenarioDescription={scenarioDescription}
-                    params={params}
-                    derived={derived}
-                    onPresetChange={handlePresetChange}
-                    onParamChange={handleParamChange}
-                />
-                <SimulationViewport params={params} />
-            </div>
+        <main>
+            <SimulationControlPanel
+                selectedPreset={selectedPreset}
+                scenarioDescription={scenarioDescription}
+                params={params}
+                derived={derived}
+                onPresetChange={handlePresetChange}
+                onParamChange={handleParamChange}
+                open={open}
+                onOpenChange={setOpen}
+            />
+            <SimulationViewport
+                params={params}
+                controlPanelOpen={open}
+                onControlPanelOpenChange={setOpen}
+            />
         </main>
     );
 };
